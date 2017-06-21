@@ -1,0 +1,11 @@
+--- v8-6.1.216/Makefile.omv~	2017-06-21 17:37:09.000956917 +0200
++++ v8-6.1.216/Makefile	2017-06-21 17:37:27.467519550 +0200
+@@ -276,7 +276,7 @@ ANDROID_ARCHES = android_ia32 android_x6
+ 		 android_mipsel android_x87
+ 
+ # List of files that trigger Makefile regeneration:
+-GYPFILES = third_party/icu/icu.gypi third_party/icu/icu.gyp \
++GYPFILES = \
+ 	   gypfiles/shim_headers.gypi gypfiles/features.gypi \
+            gypfiles/standalone.gypi \
+ 	   gypfiles/toolchain.gypi gypfiles/all.gyp gypfiles/mac/asan.gyp \

@@ -1,9 +1,10 @@
+%global optflags %{optflags} -std=gnu++14 -Wno-gnu-statement-expression
 %global major %(echo %{version} |cut -d. -f1)
 %define libname %mklibname v8 %{major}
 %define devname %mklibname -d v8
 
 Name:		v8
-Version:	5.6.331
+Version:	6.1.216
 Release:	1
 Summary:	JavaScript Engine
 Group:		System/Libraries
@@ -20,10 +21,10 @@ URL:		https://chromium.googlesource.com/v8/v8/
 # gclient sync
 # cd ..
 # mv v8 v8-%{version}
-# tar -c  --exclude=.git --exclude=build/linux --exclude third_party/binutils --exclude third_party/llvm-build --exclude third_party/icu -J -f v8-%{version}.tar.xz v8-%{version}
+# tar -c  --exclude=.git --exclude=build/linux --exclude third_party/binutils --exclude third_party/llvm-build -J -f v8-%{version}.tar.xz v8-%{version}
 Source0:	v8-%{version}.tar.xz
 Patch0:		v8-4.10.91-system_icu.patch
-#Patch1:		v8-5.2.197-readdir-fix.patch
+Patch1:		v8-6.1.216-remove-system-libs.patch
 Patch2:		v8-5.2.258-bundled-binutils.patch
 Patch3:		v8-5.6.331-soversions.patch
 ExclusiveArch:	%{ix86} x86_64 ppc ppc64 %{arm} aarch64 %{mips} s390 s390x
