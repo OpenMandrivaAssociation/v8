@@ -1,0 +1,88 @@
+diff -up v8-7.4.268/BUILD.gn.omv~ v8-7.4.268/BUILD.gn
+--- v8-7.4.268/BUILD.gn.omv~	2019-03-03 18:18:08.589685175 +0100
++++ v8-7.4.268/BUILD.gn	2019-03-03 18:23:23.115211280 +0100
+@@ -1013,9 +1013,8 @@ v8_source_set("torque_generated_initiali
+   ]
+ 
+   if (v8_enable_i18n_support) {
+-    public_deps = [
+-      "//third_party/icu",
+-    ]
++    libs = [ "icuuc", "icui18n" ]
++    defines = [ "USING_SYSTEM_ICU=1" ]
+   }
+ 
+   sources = []
+@@ -1520,9 +1519,8 @@ v8_source_set("v8_init") {
+     "src/setup-isolate-full.cc",
+   ]
+   if (v8_enable_i18n_support) {
+-    public_deps = [
+-      "//third_party/icu",
+-    ]
++    libs = [ "icuuc", "icui18n" ]
++    defines = [ "USING_SYSTEM_ICU=1" ]
+   }
+ 
+   configs = [ ":internal_config" ]
+@@ -3052,10 +3050,8 @@ v8_source_set("v8_base") {
+   ]
+ 
+   if (v8_enable_i18n_support) {
+-    public_deps += [ "//third_party/icu" ]
+-    if (is_win) {
+-      deps += [ "//third_party/icu:icudata" ]
+-    }
++    libs = [ "icuuc", "icui18n" ]
++    defines = [ "USING_SYSTEM_ICU=1" ]
+   } else {
+     sources -= [
+       "src/builtins/builtins-intl.cc",
+@@ -3460,7 +3456,8 @@ v8_source_set("fuzzer_support") {
+   ]
+ 
+   if (v8_enable_i18n_support) {
+-    public_deps += [ "//third_party/icu" ]
++    libs = [ "icuuc", "icui18n" ]
++    defines = [ "USING_SYSTEM_ICU=1" ]
+   }
+ }
+ 
+@@ -3970,9 +3967,8 @@ v8_source_set("wasm_module_runner") {
+   ]
+ 
+   if (v8_enable_i18n_support) {
+-    public_deps = [
+-      "//third_party/icu",
+-    ]
++    libs = [ "icuuc", "icui18n" ]
++    defines = [ "USING_SYSTEM_ICU=1" ]
+   }
+ 
+   configs = [
+@@ -4054,9 +4050,8 @@ v8_source_set("lib_wasm_fuzzer_common")
+   ]
+ 
+   if (v8_enable_i18n_support) {
+-    public_deps = [
+-      "//third_party/icu",
+-    ]
++    libs = [ "icuuc", "icui18n" ]
++    defines = [ "USING_SYSTEM_ICU=1" ]
+   }
+ 
+   configs = [
+diff -up v8-7.4.268/test/cctest/BUILD.gn.omv~ v8-7.4.268/test/cctest/BUILD.gn
+--- v8-7.4.268/test/cctest/BUILD.gn.omv~	2019-03-03 19:21:22.430051871 +0100
++++ v8-7.4.268/test/cctest/BUILD.gn	2019-03-03 19:25:57.178282130 +0100
+@@ -395,8 +395,8 @@ v8_source_set("cctest_sources") {
+   }
+ 
+   if (v8_enable_i18n_support) {
+-    defines += [ "V8_INTL_SUPPORT" ]
+-    public_deps += [ "//third_party/icu" ]
++    defines += [ "V8_INTL_SUPPORT", "USING_SYSTEM_ICU=1" ]
++    libs = [ "icuuc", "icui18n" ]
+   } else {
+     sources -= [ "test-intl.cc" ]
+   }

@@ -1,16 +1,17 @@
 %global optflags %{optflags} -std=gnu++14 -Wno-gnu-statement-expression
-%global major %(echo %{version} |cut -d. -f1)
+%define major %(echo %{version} |cut -d. -f1)
 %define libname %mklibname v8 %{major}
 %define devname %mklibname -d v8
 
 Name:		v8
-Version:	6.1.216
-Release:	3
+Version:	7.4.269
+Release:	1
 Summary:	JavaScript Engine
 Group:		System/Libraries
 License:	BSD
 URL:		https://chromium.googlesource.com/v8/v8/
 # To make the source, you need to have depot_tools installed and in your PATH
+# Also, python 2.x needs to be ahead of python 3.x in the PATH for now
 # https://chromium.googlesource.com/chromium/tools/depot_tools.git/+archive/7e7a454f9afdddacf63e10be48f0eab603be654e.tar.gz
 # Note that the depot_tools tarball above does not unpack into its own directory.
 # mkdir v8-tmp
@@ -21,12 +22,10 @@ URL:		https://chromium.googlesource.com/v8/v8/
 # gclient sync
 # cd ..
 # mv v8 v8-%{version}
-# tar -c  --exclude=.git --exclude=build/linux --exclude third_party/binutils --exclude third_party/llvm-build -J -f v8-%{version}.tar.xz v8-%{version}
+# tar -c --exclude=build/linux --exclude third_party/icu --exclude third_party/binutils --exclude third_party/llvm-build -J -f v8-%{version}.tar.xz v8-%{version}
 Source0:	v8-%{version}.tar.xz
-Patch0:		v8-4.10.91-system_icu.patch
-Patch1:		v8-6.1.216-remove-system-libs.patch
-Patch2:		v8-5.2.258-bundled-binutils.patch
-Patch3:		v8-5.6.331-soversions.patch
+Patch0:		v8-7.4.268-soname.patch
+Patch1:		v8-7.4.268-system-icu.patch
 ExclusiveArch:	%{ix86} x86_64 ppc ppc64 %{arm} aarch64 %{mips} s390 s390x
 Requires:	%{libname} = %{EVRD}
 BuildRequires:	pkgconfig(icu-uc)
@@ -67,19 +66,13 @@ Python libraries from v8.
 %setup -q -n %{name}-%{version}
 %apply_patches
 
+rm -rf build/linux/debian* third_party/icu
+
 ln -s /usr/bin/python2 python
 export PATH=`pwd`:$PATH
 
-# Don't make thin libraries. :(
-for i in `find . -type f -name '*.mk'`; do sed -i 's|alink_thin|alink|g' $i; done
-sed -i "s|'alink_thin'|'alink'|g" tools/gyp/pylib/gyp/generator/make.py
-sed -i "s|'alink_thin'|'alink'|g" tools/gyp/pylib/gyp/generator/ninja.py
-#sed -i "s|crsT|crs|g" out/Makefile
-sed -i "s|crsT|crs|g" tools/gyp/pylib/gyp/generator/make.py
-sed -i -e '/available targets:/iGYPFLAGS+=-Duse_sysroot=0' Makefile
-
 %build
-export PATH=`pwd`:$PATH
+export PATH=`pwd`:$PATH:$(pwd)/third_party/depot_tools
 %ifarch x86_64
 %global v8arch x64
 %endif
@@ -117,32 +110,44 @@ export PATH=`pwd`:$PATH
 %global v8arch s390x
 %endif
 
-make %{v8arch}.release \
-%ifarch armv7hl armv7hnl
-armfloatabi=hard \
-%endif
-%ifarch armv5tel armv6l armv7l
-armfloatabi=softfp \
-%endif
-system_icu=on \
-soname_version=%{major} \
-snapshot=external \
-library=shared %{?_smp_mflags} \
-bundledbinutils=off \
-CC=%{_bindir}/clang \
-CXX=%{_bindir}/clang++ \
-CFLAGS="%{optflags}" \
-CXXFLAGS="%{optflags}" \
-LDFLAGS="%{optflags}" \
-V=1
+mkdir -p out/Release
+cat >out/Release/args.gn <<EOF
+binutils_path="%{_bindir}"
+clang_base_path="%{_prefix}"
+clang_use_chrome_plugins=false
+enable_precompiled_headers=true
+is_clang=true
+is_desktop_linux=true
+is_official_build=true
+linux_use_bundled_binutils=false
+proprietary_codecs=true
+system_libdir="%{_lib}"
+target_sysroot=""
+treat_warnings_as_errors=false
+use_aura=true
+use_custom_libcxx=false
+use_custom_libcxx_for_host=false
+use_dbus=true
+use_gold=true
+use_icf=true
+use_sysroot=false
+v8_enable_embedded_binutils=false
+v8_enable_i18n_support=true
+is_cfi=false
+use_thin_lto=false
+is_component_build=true
+v8_component_build=true
+EOF
+gn gen out/Release
+%ninja_build -C out/Release
 
 %install
-pushd out/%{v8arch}.release
+# Sadly, no install target provided...
+
+pushd out/Release
 # library first
 mkdir -p %{buildroot}%{_libdir}
-cp -a lib.target/libv8*.so.%{major} %{buildroot}%{_libdir}
-# Now, the static libraries that some/most/all v8 applications also need to link against.
-cp -a obj.target/src/libv8_*.a %{buildroot}%{_libdir}
+cp -a libv8*.so.%{major} %{buildroot}%{_libdir}
 # Next, binaries
 mkdir -p %{buildroot}%{_bindir}
 install -p -m0755 {d8,v8_shell} %{buildroot}%{_bindir}
@@ -162,22 +167,15 @@ install -p src/extensions/*.h %{buildroot}%{_includedir}/v8/extensions/
 
 # Make shared library links
 pushd %{buildroot}%{_libdir}
-for i in v8 v8_libplatform v8_libbase; do
+for i in v8 v8_libplatform v8_libbase v8_for_testing; do
 	ln -sf lib${i}.so.%{major} lib${i}.so
 done
 popd
 
 # install Python JS minifier scripts for nodejs
-install -d %{buildroot}%{python_sitelib}
-sed -i 's|/usr/bin/python2.4|/usr/bin/env python2|g' tools/jsmin.py
-sed -i 's|/usr/bin/python2.4|/usr/bin/env python2|g' tools/js2c.py
-install -p -m0744 tools/jsmin.py %{buildroot}%{python_sitelib}/
-install -p -m0744 tools/js2c.py %{buildroot}%{python_sitelib}/
-chmod -R -x %{buildroot}%{python_sitelib}/*.py*
-
-%post -p /sbin/ldconfig
-
-%postun -p /sbin/ldconfig
+install -d %{buildroot}%{py2_puresitedir}
+install -p -m0744 tools/js2c.py %{buildroot}%{py2_puresitedir}/
+chmod -R -x %{buildroot}%{py2_puresitedir}/*.py*
 
 %files
 %doc AUTHORS ChangeLog
@@ -189,6 +187,7 @@ chmod -R -x %{buildroot}%{python_sitelib}/*.py*
 %{_libdir}/libv8.so.%{major}
 %{_libdir}/libv8_libbase.so.%{major}
 %{_libdir}/libv8_libplatform.so.%{major}
+%{_libdir}/libv8_for_testing.so.%{major}
 
 %files -n %{devname}
 %{_includedir}/*.h
@@ -198,7 +197,7 @@ chmod -R -x %{buildroot}%{python_sitelib}/*.py*
 %{_libdir}/libv8.so
 %{_libdir}/libv8_libbase.so
 %{_libdir}/libv8_libplatform.so
-%{_libdir}/*.a
+%{_libdir}/libv8_for_testing.so
 
 %files -n python2-%{name}
-%{python_sitelib}/j*.py*
+%{py2_puresitedir}/j*.py*

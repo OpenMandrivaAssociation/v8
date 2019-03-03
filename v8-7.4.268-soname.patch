@@ -1,0 +1,37 @@
+diff -up v8-7.4.268/BUILD.gn.omv~ v8-7.4.268/BUILD.gn
+--- v8-7.4.268/BUILD.gn.omv~	2019-03-03 04:58:17.823337989 +0100
++++ v8-7.4.268/BUILD.gn	2019-03-03 04:59:31.336411749 +0100
+@@ -3281,6 +3281,7 @@ v8_component("v8_libbase") {
+ 
+   if (is_component_build) {
+     defines = [ "BUILDING_V8_BASE_SHARED" ]
++    output_extension = "so.7"
+   }
+ 
+   if (is_posix || is_fuchsia) {
+@@ -3413,6 +3414,7 @@ v8_component("v8_libplatform") {
+ 
+   if (is_component_build) {
+     defines = [ "BUILDING_V8_PLATFORM_SHARED" ]
++    output_extension = "so.7"
+   }
+ 
+   public_configs = [ ":libplatform_config" ]
+@@ -3679,6 +3681,8 @@ if (is_component_build) {
+       "src/v8dll-main.cc",
+     ]
+ 
++    output_extension = "so.7"
++
+     public_deps = [
+       ":v8_base",
+       ":v8_maybe_snapshot",
+@@ -3696,6 +3700,8 @@ if (is_component_build) {
+       "src/v8dll-main.cc",
+     ]
+ 
++    output_extension = "so.7"
++
+     public_deps = [
+       ":torque_base",
+       ":v8_base",
