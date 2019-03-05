@@ -29,6 +29,10 @@ Patch1:		v8-7.4.268-system-icu.patch
 ExclusiveArch:	%{ix86} x86_64 ppc ppc64 %{arm} aarch64 %{mips} s390 s390x
 Requires:	%{libname} = %{EVRD}
 BuildRequires:	pkgconfig(icu-uc)
+BuildRequires:	pkgconfig(glib-2.0)
+BuildRequires:	pkgconfig(gmodule-2.0)
+BuildRequires:	pkgconfig(gobject-2.0)
+BuildRequires:	pkgconfig(gthread-2.0)
 BuildRequires:	readline-devel
 BuildRequires:	python2-devel
 BuildRequires:	clang
