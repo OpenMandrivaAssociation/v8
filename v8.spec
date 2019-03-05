@@ -26,7 +26,7 @@ URL:		https://chromium.googlesource.com/v8/v8/
 Source0:	v8-%{version}.tar.xz
 Patch0:		v8-7.4.268-soname.patch
 Patch1:		v8-7.4.268-system-icu.patch
-ExclusiveArch:	%{ix86} x86_64 ppc ppc64 %{arm} aarch64 %{mips} s390 s390x
+ExclusiveArch:	%{ix86} %{x86_64} ppc ppc64 %{arm} %{aarch64} %{mips} s390 s390x
 Requires:	%{libname} = %{EVRD}
 BuildRequires:	pkgconfig(icu-uc)
 BuildRequires:	pkgconfig(glib-2.0)
@@ -36,6 +36,7 @@ BuildRequires:	pkgconfig(gthread-2.0)
 BuildRequires:	readline-devel
 BuildRequires:	python2-devel
 BuildRequires:	clang
+BuildRequires:	ninja
 
 %description
 V8 is Google's open source JavaScript engine. V8 is written in C++ and is used 
@@ -78,7 +79,7 @@ export PATH=`pwd`:$PATH
 
 %build
 export PATH=`pwd`:$PATH:$(pwd)/third_party/depot_tools
-%ifarch x86_64
+%ifarch %{x86_64}
 %global v8arch x64
 %endif
 %ifarch %{ix86}
@@ -87,7 +88,7 @@ export PATH=`pwd`:$PATH:$(pwd)/third_party/depot_tools
 %ifarch %{arm}
 %global v8arch arm
 %endif
-%ifarch aarch64
+%ifarch %{aarch64}
 %global v8arch arm64
 %endif
 %ifarch mips
