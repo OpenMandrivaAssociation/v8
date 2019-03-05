@@ -37,6 +37,7 @@ BuildRequires:	readline-devel
 BuildRequires:	python2-devel
 BuildRequires:	clang
 BuildRequires:	ninja
+BuildRequires:	lld
 
 %description
 V8 is Google's open source JavaScript engine. V8 is written in C++ and is used 
