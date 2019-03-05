@@ -4,7 +4,7 @@
 %define devname %mklibname -d v8
 
 Name:		v8
-Version:	7.4.269
+Version:	7.4.284
 Release:	1
 Summary:	JavaScript Engine
 Group:		System/Libraries
@@ -50,6 +50,7 @@ Shared library for the v8 JavaScript engine
 Group:		Development/C++
 Summary:	Development headers and libraries for v8
 Requires:	%{libname} = %{EVRD}
+Provides:	v8-devel = %{EVRD}
 
 %description -n %{devname}
 Development headers and libraries for v8.
