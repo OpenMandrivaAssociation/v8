@@ -35,6 +35,7 @@ BuildRequires:	pkgconfig(gobject-2.0)
 BuildRequires:	pkgconfig(gthread-2.0)
 BuildRequires:	readline-devel
 BuildRequires:	python2-devel
+BuildRequires:	atomic-devel
 BuildRequires:	clang
 BuildRequires:	ninja
 BuildRequires:	lld
