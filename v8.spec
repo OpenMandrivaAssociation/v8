@@ -72,7 +72,7 @@ Python libraries from v8.
 
 %prep
 %setup -q -n %{name}-%{version}
-%apply_patches
+%autopatch -p1
 
 rm -rf build/linux/debian* third_party/icu
 
