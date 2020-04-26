@@ -1,88 +1,51 @@
-diff -up v8-7.4.268/BUILD.gn.omv~ v8-7.4.268/BUILD.gn
---- v8-7.4.268/BUILD.gn.omv~	2019-03-03 18:18:08.589685175 +0100
-+++ v8-7.4.268/BUILD.gn	2019-03-03 18:23:23.115211280 +0100
-@@ -1013,9 +1013,8 @@ v8_source_set("torque_generated_initiali
-   ]
+diff -up v8-8.4.154/BUILD.gn.2~ v8-8.4.154/BUILD.gn
+--- v8-8.4.154/BUILD.gn.2~	2020-04-24 16:18:31.786032144 +0200
++++ v8-8.4.154/BUILD.gn	2020-04-24 16:26:55.808244463 +0200
+@@ -1274,7 +1274,6 @@ if (v8_verify_torque_generation_invarian
  
+ group("v8_maybe_icu") {
    if (v8_enable_i18n_support) {
--    public_deps = [
--      "//third_party/icu",
--    ]
-+    libs = [ "icuuc", "icui18n" ]
-+    defines = [ "USING_SYSTEM_ICU=1" ]
-   }
- 
-   sources = []
-@@ -1520,9 +1519,8 @@ v8_source_set("v8_init") {
-     "src/setup-isolate-full.cc",
-   ]
-   if (v8_enable_i18n_support) {
--    public_deps = [
--      "//third_party/icu",
--    ]
-+    libs = [ "icuuc", "icui18n" ]
-+    defines = [ "USING_SYSTEM_ICU=1" ]
-   }
- 
-   configs = [ ":internal_config" ]
-@@ -3052,10 +3050,8 @@ v8_source_set("v8_base") {
-   ]
- 
-   if (v8_enable_i18n_support) {
--    public_deps += [ "//third_party/icu" ]
--    if (is_win) {
--      deps += [ "//third_party/icu:icudata" ]
--    }
-+    libs = [ "icuuc", "icui18n" ]
-+    defines = [ "USING_SYSTEM_ICU=1" ]
-   } else {
-     sources -= [
-       "src/builtins/builtins-intl.cc",
-@@ -3460,7 +3456,8 @@ v8_source_set("fuzzer_support") {
-   ]
- 
-   if (v8_enable_i18n_support) {
--    public_deps += [ "//third_party/icu" ]
-+    libs = [ "icuuc", "icui18n" ]
-+    defines = [ "USING_SYSTEM_ICU=1" ]
+-    public_deps = [ "//third_party/icu" ]
    }
  }
  
-@@ -3970,9 +3967,8 @@ v8_source_set("wasm_module_runner") {
-   ]
+@@ -4253,9 +4254,12 @@ if (v8_enable_i18n_support) {
+       deps = [
+         ":v8_libbase",
+         "//build/win:default_exe_manifest",
+-        "//third_party/icu",
+       ]
+ 
++      libs = [ "icuuc", "icui18n" ]
++
++      defines = [ "USING_SYSTEM_ICU=1" ]
++
+       configs = [ ":internal_config" ]
+     }
+   }
+diff -up v8-8.4.154/test/cctest/BUILD.gn.2~ v8-8.4.154/test/cctest/BUILD.gn
+--- v8-8.4.154/test/cctest/BUILD.gn.2~	2020-04-24 16:18:31.786032144 +0200
++++ v8-8.4.154/test/cctest/BUILD.gn	2020-04-24 16:27:28.288664191 +0200
+@@ -413,7 +413,8 @@ v8_source_set("cctest_sources") {
  
    if (v8_enable_i18n_support) {
--    public_deps = [
--      "//third_party/icu",
--    ]
-+    libs = [ "icuuc", "icui18n" ]
-+    defines = [ "USING_SYSTEM_ICU=1" ]
-   }
- 
-   configs = [
-@@ -4054,9 +4050,8 @@ v8_source_set("lib_wasm_fuzzer_common")
-   ]
- 
-   if (v8_enable_i18n_support) {
--    public_deps = [
--      "//third_party/icu",
--    ]
-+    libs = [ "icuuc", "icui18n" ]
-+    defines = [ "USING_SYSTEM_ICU=1" ]
-   }
- 
-   configs = [
-diff -up v8-7.4.268/test/cctest/BUILD.gn.omv~ v8-7.4.268/test/cctest/BUILD.gn
---- v8-7.4.268/test/cctest/BUILD.gn.omv~	2019-03-03 19:21:22.430051871 +0100
-+++ v8-7.4.268/test/cctest/BUILD.gn	2019-03-03 19:25:57.178282130 +0100
-@@ -395,8 +395,8 @@ v8_source_set("cctest_sources") {
-   }
- 
-   if (v8_enable_i18n_support) {
--    defines += [ "V8_INTL_SUPPORT" ]
+     defines += [ "V8_INTL_SUPPORT" ]
 -    public_deps += [ "//third_party/icu" ]
-+    defines += [ "V8_INTL_SUPPORT", "USING_SYSTEM_ICU=1" ]
 +    libs = [ "icuuc", "icui18n" ]
++    defines += [ "USING_SYSTEM_ICU=1" ]
    } else {
      sources -= [ "test-intl.cc" ]
    }
+diff -up v8-8.4.154/tools/debug_helper/BUILD.gn.omv~ v8-8.4.154/tools/debug_helper/BUILD.gn
+--- v8-8.4.154/tools/debug_helper/BUILD.gn.omv~	2020-04-24 16:40:39.888209875 +0200
++++ v8-8.4.154/tools/debug_helper/BUILD.gn	2020-04-24 16:41:07.189579862 +0200
+@@ -92,7 +92,8 @@ v8_component("v8_debug_helper") {
+ 
+   configs = [ ":internal_config" ]
+   if (v8_enable_i18n_support) {
+-    configs += [ "//third_party/icu:icu_config" ]
++    defines = [ "USING_SYSTEM_ICU=1" ]
++    libs = [ "icuuc", "icui18n" ]
+   }
+ 
+   remove_configs = [ "//build/config/compiler:no_rtti" ]

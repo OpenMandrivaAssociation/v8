@@ -4,28 +4,18 @@
 %define devname %mklibname -d v8
 
 Name:		v8
-Version:	7.4.284
+Version:	8.4.154
 Release:	1
 Summary:	JavaScript Engine
 Group:		System/Libraries
 License:	BSD
 URL:		https://chromium.googlesource.com/v8/v8/
-# To make the source, you need to have depot_tools installed and in your PATH
-# Also, python 2.x needs to be ahead of python 3.x in the PATH for now
-# https://chromium.googlesource.com/chromium/tools/depot_tools.git/+archive/7e7a454f9afdddacf63e10be48f0eab603be654e.tar.gz
-# Note that the depot_tools tarball above does not unpack into its own directory.
-# mkdir v8-tmp
-# cd v8-tmp
-# fetch v8
-# cd v8
-# git checkout %{version}
-# gclient sync
-# cd ..
-# mv v8 v8-%{version}
-# tar -c --exclude=build/linux --exclude third_party/icu --exclude third_party/binutils --exclude third_party/llvm-build -J -f v8-%{version}.tar.xz v8-%{version}
-Source0:	v8-%{version}.tar.xz
+Source0:	v8-%{version}.tar.zst
+# Not used by the spec -- use this to generate the source tarball listed above.
+Source1000:	package-source.sh
 Patch0:		v8-7.4.268-soname.patch
 Patch1:		v8-7.4.268-system-icu.patch
+Patch2:		v8-8.4.154-compile.patch
 ExclusiveArch:	%{ix86} %{x86_64} ppc ppc64 %{arm} %{aarch64} %{mips} s390 s390x
 Requires:	%{libname} = %{EVRD}
 BuildRequires:	pkgconfig(icu-uc)
@@ -162,7 +152,7 @@ install -p -m0755 {d8,v8_shell} %{buildroot}%{_bindir}
 # install -p -m0755 mksnapshot %{buildroot}%{_bindir}
 # install -p -m0755 parser_fuzzer %{buildroot}%{_bindir}
 # BLOBS! (Don't stress. They get built out of source code.)
-install -p natives_blob.bin snapshot_blob.bin %{buildroot}%{_libdir}
+install -p snapshot_blob.bin %{buildroot}%{_libdir}
 popd
 
 # Now, headers
@@ -180,13 +170,8 @@ for i in v8 v8_libplatform v8_libbase v8_for_testing; do
 done
 popd
 
-# install Python JS minifier scripts for nodejs
-install -d %{buildroot}%{py2_puresitedir}
-install -p -m0744 tools/js2c.py %{buildroot}%{py2_puresitedir}/
-chmod -R -x %{buildroot}%{py2_puresitedir}/*.py*
-
 %files
-%doc AUTHORS ChangeLog
+%doc AUTHORS
 %{_bindir}/d8
 %{_bindir}/v8_shell
 %{_libdir}/*.bin
@@ -206,6 +191,3 @@ chmod -R -x %{buildroot}%{py2_puresitedir}/*.py*
 %{_libdir}/libv8_libbase.so
 %{_libdir}/libv8_libplatform.so
 %{_libdir}/libv8_for_testing.so
-
-%files -n python2-%{name}
-%{py2_puresitedir}/j*.py*

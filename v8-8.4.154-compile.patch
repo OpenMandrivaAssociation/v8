@@ -1,0 +1,23 @@
+diff -up v8-8.4.154/src/base/template-utils.h.omv~ v8-8.4.154/src/base/template-utils.h
+--- v8-8.4.154/src/base/template-utils.h.omv~	2020-04-24 17:05:07.772256216 +0200
++++ v8-8.4.154/src/base/template-utils.h	2020-04-24 17:05:24.679487860 +0200
+@@ -9,6 +9,7 @@
+ #include <functional>
+ #include <type_traits>
+ #include <utility>
++#include <iostream>
+ 
+ namespace v8 {
+ namespace base {
+diff -up v8-8.4.154/build/config/compiler/BUILD.gn.omv~ v8-8.4.154/build/config/compiler/BUILD.gn
+--- v8-8.4.154/build/config/compiler/BUILD.gn.omv~	2020-04-24 22:58:05.440681662 +0200
++++ v8-8.4.154/build/config/compiler/BUILD.gn	2020-04-24 22:59:10.806149112 +0200
+@@ -458,6 +458,8 @@ config("compiler") {
+     # error.  "-lpthread" is added in //build/config:default_libs.
+   }
+ 
++  ldflags += [ "-licuuc", "-licui18n" ]
++
+   # Clang-specific compiler flags setup.
+   # ------------------------------------
+   if (is_clang) {

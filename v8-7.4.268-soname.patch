@@ -1,36 +1,36 @@
-diff -up v8-7.4.284/BUILD.gn.0000~ v8-7.4.284/BUILD.gn
---- v8-7.4.284/BUILD.gn.0000~	2019-03-05 16:06:08.000000000 +0100
-+++ v8-7.4.284/BUILD.gn	2019-03-05 16:24:17.981154681 +0100
-@@ -3283,6 +3283,7 @@ v8_component("v8_libbase") {
+diff -up v8-8.4.154/BUILD.gn.1~ v8-8.4.154/BUILD.gn
+--- v8-8.4.154/BUILD.gn.1~	2020-04-24 14:12:37.000000000 +0200
++++ v8-8.4.154/BUILD.gn	2020-04-24 16:17:30.076328900 +0200
+@@ -3780,6 +3780,7 @@ v8_component("v8_libbase") {
  
    if (is_component_build) {
      defines = [ "BUILDING_V8_BASE_SHARED" ]
-+    output_extension = "so.7"
++    output_extension = "so.8"
    }
  
    if (is_posix || is_fuchsia) {
-@@ -3415,6 +3416,7 @@ v8_component("v8_libplatform") {
+@@ -3919,6 +3920,7 @@ v8_component("v8_libplatform") {
  
    if (is_component_build) {
      defines = [ "BUILDING_V8_PLATFORM_SHARED" ]
-+    output_extension = "so.7"
++    output_extension = "so.8"
    }
  
    public_configs = [ ":libplatform_config" ]
-@@ -3681,6 +3683,8 @@ if (is_component_build) {
-       "src/v8dll-main.cc",
-     ]
+@@ -4380,6 +4382,8 @@ if (is_component_build) {
+   v8_component("v8") {
+     sources = [ "src/utils/v8dll-main.cc" ]
  
-+    output_extension = "so.7"
++    output_extension = "so.8"
 +
      public_deps = [
        ":v8_base",
-       ":v8_maybe_snapshot",
-@@ -3698,6 +3702,8 @@ if (is_component_build) {
-       "src/v8dll-main.cc",
-     ]
+       ":v8_snapshot",
+@@ -4395,6 +4399,8 @@ if (is_component_build) {
  
-+    output_extension = "so.7"
+     sources = [ "src/utils/v8dll-main.cc" ]
+ 
++    output_extension = "so.8"
 +
      public_deps = [
        ":torque_base",
