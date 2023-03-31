@@ -5,7 +5,7 @@
 
 Name:		v8
 Version:	8.4.154
-Release:	1
+Release:	2
 Summary:	JavaScript Engine
 Group:		System/Libraries
 License:	BSD
